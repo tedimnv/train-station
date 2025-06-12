@@ -5,4 +5,6 @@
 class DistanceCard : public DiscountCard
 {
     double maxDistance;
+
+
 };

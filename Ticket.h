@@ -8,7 +8,7 @@ class Ticket
 {
     Time timeOfPurchase;
     Train train;
-    Wagon wagon;
+    Wagon* wagon;
     double discount;
 };
 

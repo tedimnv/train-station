@@ -2,6 +2,7 @@
 
 #include "Time.h"
 #include "Station.h"
+#include "Wagon.h"
 
 class Train
 {
@@ -14,6 +15,16 @@ class Train
     int arrivalPlatform;
     double distance;
     int speed;
-    // wagons - без vector
+    std::vector<Wagon*> wagon;//без vector
+
+public:
+    void addWagon(Wagon*);
+    void removeWagon(int wagonID);
+    Wagon* getWagonByID(int wagonID);
+    void calculateArrivalTime(); //Конструктор, 
+    //който изчислява arrivalDateTime на база 
+    //departureDateTime, distanceKm и speedKmH.
+    bool hasDeparted(const Time& currentTime);
+    bool hasArrived(const Time& currentTime);
 };
 

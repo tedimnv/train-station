@@ -4,6 +4,14 @@
 
 class FirstClass : public Wagon
 {
-    double comfort; //from 0-1 
+    int seatCount = 10;
+    double comfortFactor; //from 0-1 
     bool includesFood;
+
+public:
+    virtual double calculatePrice(double Price, double comfortFactor, bool includesFood);
+    double ticketPrice() override; 
+
+    // HELP W THIS ^^^
 };
+
