@@ -6,13 +6,16 @@
 
 class Station
 {
-    std::string name; // без string 
-    int platform; //не трябва да е с int рабери как без vector
+    char* name;
+	int пlatform;
+	Train** trains;
+	size_t trainsCount;
+
     //departingTrains и arrivingTrains 
 
 public:
     void addTrain(Train*);
-    std::vector<Train*> getArrivingTrains(); //без vector
-    std::vector<Train*> getDepartingTrains(); //без vector
+    //std::vector<Train*> getArrivingTrains(); //без vector
+    //std::vector<Train*> getDepartingTrains(); //без vector
     int getFreePlatform(const Time& time);
 };

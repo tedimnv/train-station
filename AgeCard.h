@@ -7,5 +7,9 @@ class AgeCard : public DiscountCard
     int age;
 
 public:
-    double discountSum(double startingPrice, int discountPercentage) const override;
+
+    AgeCard(int age);
+
+    void setDiscount();
+    void getAge(int age);
 };

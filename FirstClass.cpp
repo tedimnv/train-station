@@ -11,9 +11,9 @@ double FirstClass::calculatePrice(double startingPrice, double comfortFactor, bo
         foodPrice = 0;
 
     return startingPrice * comfortFactor + foodPrice;
-};
+}
 
 double FirstClass::ticketPrice()
 {
-    // Някак да направя ticketPrice() = calculatePrice ???
+    return this->getStartingPrice()*this->comfortFactor + this->includesFood*constants::FOOD_PRICE;
 }
