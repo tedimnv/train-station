@@ -9,7 +9,13 @@ class Ticket
     Time timeOfPurchase;
     Train train;
     Wagon* wagon;
-    double discount;
+    int seatID;
+    double basePrice;
+    double discountApplied;
+    double finalPrice;
+
+public:
+    void saveToFile(const std::string& fileName);
 };
 
 void saveToFile(); //да се запази във файл

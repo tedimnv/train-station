@@ -11,3 +11,13 @@ int Station::getFreePlatform(const Time &time)
 {
 
 }
+
+void Station::printDepartingTrains()
+{
+
+}
+
+void Station::printArrivingTrains()
+{
+
+}

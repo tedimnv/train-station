@@ -17,8 +17,10 @@ AgeCard::AgeCard(int age)
 
 void AgeCard::getAge(int age)
 {
+    
     if(age <= 0)
         std::cout << "Wrong input! Age should be a positive number. " << std::endl;
+
 }
 
 

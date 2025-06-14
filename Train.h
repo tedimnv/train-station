@@ -1,8 +1,8 @@
 #pragma once
-
 #include "Time.h"
-#include "Station.h"
 #include "Wagon.h"
+
+class Station;
 
 class Train
 {
@@ -15,7 +15,7 @@ class Train
     int arrivalPlatform;
     double distance;
     int speed;
-    std::vector<Wagon*> wagon;//без vector
+    std::vector<Wagon*> wagons;
 
 public:
     void addWagon(Wagon*);

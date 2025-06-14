@@ -8,9 +8,11 @@ class Admin : public User
 
 public:
     bool login(std::string username, std::string password);
-    void addStation();
-    void addTrain();
-    void addWagon();
+    void addStation(std::string station);
+    void addTrain(std::string station, std::string destination, int distance, int speed, std::string date, std::string time);
+    void removeTrain(int trainID);
+    void addWagon(int trainID);
+    void moveWagon();
     void createDiscountCard();
     void validateDiscountCard();
 };

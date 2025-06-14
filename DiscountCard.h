@@ -1,12 +1,12 @@
 #pragma once
 
-class DiscountCard
+class DiscountCard //abstract
 {
-    // име без string!!
-    int ID; //6 цифри randomizer
-    int discountPercentage;
+    std::string name;
+    int ID; //6 цифри 
     
 public:
+    int discountPercentage;
     void setDiscountPercentage(int percentage);
     void getID(int id);
     void isApplicable();

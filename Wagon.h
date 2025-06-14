@@ -1,16 +1,21 @@
 #pragma once
+#include <vector>
+
+struct Seat
+{
+    int seatNumber;
+    bool taken;
+};
 
 class Wagon //abstract
 {
     int wagonID;
-    double startingPrice;
-    bool* seats;
-    
-   // Seat** seats;
+    double startingPrice;    
+    std::vector<Seat> seats;
 
     void setWagonID();
     void setStartingPrice(double startingPrice);
-    void setSeats(size_t seatsCount);
+    void setSeats(int seatsCount);
     
     
 public:
@@ -26,8 +31,4 @@ public:
     // const int chars = "===Age Card===" +1; >> <<
 };
 
-struct Seat
-{
-    int seatNumber;
-    bool taken;
-};
+

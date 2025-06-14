@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Train.h"
+#include "Wagon.h"
 
 void Train::addWagon(Wagon*)
 {
