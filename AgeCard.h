@@ -4,12 +4,14 @@
 
 class AgeCard : public DiscountCard
 {
-    int age;
-
-public:
-
-    AgeCard(int age);
+    int cardHolderAge;
 
     void setDiscount();
-    void getAge(int age);
+    void setAge(int age);
+    
+public:
+	 AgeCard(int age);
+     AgeCard(const char* name, int age);
+
+	const int getCardHoldersAge() const;
 };

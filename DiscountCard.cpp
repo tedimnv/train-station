@@ -6,6 +6,16 @@ namespace constants
 	const int ID_CHARECTERS_COUNT = 6;
 }
 
+void DiscountCard::copyFrom(const DiscountCard& other)
+{
+	this->ID = other.ID;
+	this->discountPercentage = other.discountPercentage;
+	this->cardHolderName = other.cardHolderName;
+	// this->classType = other.classType;
+	// this->fieldInfo = other.fieldInfo;
+}
+
+
 void DiscountCard::setDiscountPercentage(int percentage)
 {
     this->discountPercentage = percentage;

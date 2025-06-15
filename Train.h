@@ -6,9 +6,9 @@ class Station;
 
 class Train
 {
-    int trainID;
-    Station* StartingStation;
-    Station* FinalStation;
+    int trainId;
+    Station* startingStation;
+    Station* finalStation;
     Time DepartureTime;
     Time ArrivalTime;
     int departurePlatform;
@@ -18,6 +18,21 @@ class Train
     std::vector<Wagon*> wagons;
 
 public:
+    void setStartingStation(const Station* station)
+    {
+        startingStation = station;
+    }
+
+    void setFinalStation(const Station* station)
+    {
+        finalStation = station;
+    }
+
+    int getId() const {
+        return trainId;
+    }
+
+    
     void addWagon(Wagon*);
     void removeWagon(int wagonID);
     Wagon* getWagonByID(int wagonID);

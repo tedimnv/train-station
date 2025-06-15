@@ -21,3 +21,13 @@ void Station::printArrivingTrains()
 {
 
 }
+
+std::__1::vector<Train*> Station::getArrivingTrains()
+{
+
+}
+
+std::__1::vector<Train*> Station::getDepartingTrains()
+{
+    
+}

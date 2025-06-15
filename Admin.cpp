@@ -21,23 +21,23 @@ void Admin::removeTrain(int trainID)
 
 }
 
-void Admin::addWagon(int trainI)
-{
+// void Admin::addWagon(int trainI)
+// {
     
-}
+// }
 
-void Admin::moveWagon()
-{
+// void Admin::moveWagon()
+// {
 
-}
+// }
 
-void Admin::createDiscountCard()
-{
+// void Admin::createDiscountCard()
+// {
 
-}
+// }
 
-void Admin::validateDiscountCard()
-{
+// void Admin::validateDiscountCard()
+// {
 
-}
+// }
 

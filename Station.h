@@ -1,18 +1,24 @@
 #pragma once
 #include "Time.h"
+#include "TrainRepo.h"
 
 class Train;
 
-class Station
+class Station: public TrainRepo
 {
     std::string name;
 	std::vector<int> platforms;
-    std::vector<Train*> departingTrains;
+    std::vector<Train*> arrivingTrains;
 	int trainsCount;
     
 public:
 
-    void addTrain(Train*);
+    Station(std::string name) : name(name){};
+    std::string getStationName() const
+    {
+        return name;
+    }
+
     std::vector<Train*> getArrivingTrains();
     std::vector<Train*> getDepartingTrains();
     int getFreePlatform(const Time& time);
