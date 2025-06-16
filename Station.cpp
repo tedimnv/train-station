@@ -2,32 +2,28 @@
 #include "Station.h"
 #include "Train.h"
 
-void Station::addTrain(Train *)
-{
 
-}
+// int Station::getFreePlatform(const Time &time)
+// {
 
-int Station::getFreePlatform(const Time &time)
-{
+// }
 
-}
+// void Station::printDepartingTrains()
+// {
 
-void Station::printDepartingTrains()
-{
+// }
 
-}
+// void Station::printArrivingTrains()
+// {
 
-void Station::printArrivingTrains()
-{
+// }
 
-}
+// std::__1::vector<Train*> Station::getArrivingTrains()
+// {
 
-std::__1::vector<Train*> Station::getArrivingTrains()
-{
+// }
 
-}
+// std::__1::vector<Train*> Station::getDepartingTrains()
+// {
 
-std::__1::vector<Train*> Station::getDepartingTrains()
-{
-    
-}
+// }

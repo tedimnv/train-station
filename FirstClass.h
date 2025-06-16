@@ -16,6 +16,5 @@ public:
     virtual double calculatePrice(double Price, double comfortFactor, bool includesFood);
     double ticketPrice() override; 
 
-    // HELP W THIS ^^^
 };
 

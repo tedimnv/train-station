@@ -15,10 +15,7 @@ public:
         return other.username == username && other.password == password;
     }
 
-    bool login(std::string username, std::string password);
-    void addStation(std::string station);
-    void addTrain(std::string station, std::string destination, int distance, int speed, std::string date, std::string time);
-    void removeTrain(int trainID);
+    
     // void addWagonFirstClass(int trainID, int wagonType, double basePrice, double comfortFactor);
     // void addWagonSecondClass(int trainID, int wagonType, double basePrice, double pricePerKg);
     // void addWagonThirdClass(int trainID, int wagonType, double basePrice, double pricePer100Km);

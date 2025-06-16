@@ -1,0 +1,7 @@
+login tedi 123
+add-station London
+add-station Paris
+add-station Berlin
+add-train London Paris 200 200 03/03/2000 10:10
+add-train Paris Berlin 200 200 03/03/2000 11:30
+exit

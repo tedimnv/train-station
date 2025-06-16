@@ -8,4 +8,6 @@ project(
 
 file(GLOB SOURCES *.cpp *.h)
 
+set(CMAKE_CXX_STANDARD 20)
+
 add_executable(TrainStation ${SOURCES})

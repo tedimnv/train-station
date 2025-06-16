@@ -1,4 +1,9 @@
 #pragma once
+#include <ctime>
+#include <chrono>
+#include <sstream>
+#include <iomanip>
+#include <iostream>
 
 class Time
 {
@@ -8,26 +13,33 @@ class Time
     int hour;
     int minute;
 
-    // някак да направя функции за сравнение, конвертиране, изчисление на разлики, текущ час
 };
 
-void dateTimeToTimePoint(std::string date, std::string time)
+using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
+
+static const char * TIME_FORMAT= "%d/%m/%Y %H:%M";
+
+static inline TimePoint parseTime(std::istream & is)
 {
-    auto dateComponents = split(date, '/');
-    auto timeComponents = split(time, ':');
-    std::mt = 
-    {
-        0,
-        0,
-        std::atoi(timeComponents[0])
-        
-    }
-    return;
+    std::tm tm = {};
+    is >> std::get_time(&tm, TIME_FORMAT);
+    return std::chrono::system_clock::from_time_t(std::mktime(&tm));
+}
+
+static inline TimePoint getCurrentTime()
+{
+    return std::chrono::system_clock::now();
+}
+
+static inline void printTime(TimePoint tp)
+{
+    std::time_t time_t = std::chrono::system_clock::to_time_t(tp);
+    std::cout << std::put_time(std::localtime(&time_t), TIME_FORMAT);
 }
 
 // split("12/05/2022", '/') -> ["12", "05", "2022"]
 // split("10:11", ':') -> ["10", "11"]
-std::vector<std::string> split(const std::string& str, char delimiter)
+static inline std::vector<std::string> split(const std::string& str, char delimiter)
 {
     std::istringstream ss(str);
     std::string word;

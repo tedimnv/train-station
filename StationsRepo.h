@@ -6,23 +6,54 @@ class StationsRepo
 {
 public:
 
-    void addStation(std::string station)
-    {
-        stations.push_back(Station(station));
-    }
+    void addStation(std::string station);
+    const std::vector<Station>& getAll() const;
+    Station * findByName(const std::string& name);
 
-    const std::vector<Station>& getAll() const
+    bool removeTrainById(int trainId) 
     {
-        return stations;
-    }
-
-    Station * findByName(const std::string& name) 
-    {
-        for (size_t i = 0; i < stations.size(); i++) 
+        bool trainFound = false;
+        
+        // минаваме през всички гари
+        for (Station& station : stations) 
         {
-            if (stations[i].name == name) 
+            auto& departingTrains = station.getDepartingTrains();
+            for (auto it = departingTrains.begin(); it != departingTrains.end(); ++it) 
             {
-                return &stations[i];
+                if ((*it)->getId() == trainId) 
+                {
+                    delete *it;
+                    departingTrains.erase(it);
+                    trainFound = true;
+                    break;
+                }
+            }
+            
+            auto& arrivingTrains = station.getArrivingTrains();
+            for (auto it = arrivingTrains.begin(); it != arrivingTrains.end(); ++it) 
+            {
+                if ((*it)->getId() == trainId) 
+                {
+                    arrivingTrains.erase(it);
+                    break;
+                }
+            }
+        }
+        
+        return trainFound;
+    }
+
+    Train* findTrainById(int trainId) 
+    {
+        for (Station& station : stations) 
+        {
+            const auto& departingTrains = station.getDepartingTrains();
+            for (Train* train : departingTrains) 
+            {
+                if (train->getId() == trainId) 
+                {
+                    return train;
+                }
             }
         }
         return nullptr;

@@ -20,6 +20,11 @@ class Wagon //abstract
     
 public:
     
+    int getId() const 
+    {
+        return wagonID;
+    }
+
     virtual void printSeats(int seatCount) const = 0;
     bool isSeatAvailable(int seatNumber);
     void bookSeat(int seatNumber);
