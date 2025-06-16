@@ -1,0 +1,9 @@
+login tedi 123
+add-station London
+add-station Paris
+add-station Amsterdam
+add-train London Paris 120 60 03/03/2000 10:10
+add-train Paris Amsterdam 60 100 03/03/2000 11:30
+add-wagon 1 1 0.5 1
+add-wagon 0 1 0.5 1
+exit

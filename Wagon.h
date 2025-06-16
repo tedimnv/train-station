@@ -9,27 +9,69 @@ struct Seat
 
 class Wagon //abstract
 {
+    static int nextWagonID;  // генериране на ID
     int wagonID;
     double startingPrice;    
     std::vector<Seat> seats;
 
-    void setWagonID();
-    void setStartingPrice(double startingPrice);
-    void setSeats(int seatsCount);
-    
     
 public:
-    
-    int getId() const 
-    {
-        return wagonID;
+
+   
+
+    void setWagonID()
+    { 
+        wagonID = nextWagonID++; 
     }
 
-    virtual void printSeats(int seatCount) const = 0;
-    bool isSeatAvailable(int seatNumber);
-    void bookSeat(int seatNumber);
+    Wagon() { setWagonID(); }  
+    virtual ~Wagon() = default;
 
-    const int getStartingPrice() const;
+    void setStartingPrice(double price)
+    { 
+        startingPrice = price; 
+    }
+    
+    void setSeats(int seatsCount)
+    {
+        seats.clear();
+        for (int i = 1; i <= seatsCount; i++) {
+            seats.push_back({i, false});
+        }
+    }
+
+    int getId() const
+    { 
+        return wagonID; 
+    }
+
+
+    virtual void printSeats(int seatCount) const = 0;
+    bool isSeatAvailable(int seatNumber) const
+    {
+        for (const auto& seat : seats) {
+            if (seat.seatNumber == seatNumber) {
+                return !seat.taken;
+            }
+        }
+        return false;
+    }
+
+    void bookSeat(int seatNumber)
+    {
+        for (auto& seat : seats) {
+            if (seat.seatNumber == seatNumber) {
+                seat.taken = true;
+                break;
+            }
+        }
+    }
+
+    const int getStartingPrice() const
+    { 
+        return startingPrice; 
+    }
+
     virtual double ticketPrice() = 0;
     
 

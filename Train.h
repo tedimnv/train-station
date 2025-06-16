@@ -85,19 +85,28 @@ public:
 
    
 
-    void setSpeed(int s) {
+    void setSpeed(int s) 
+    {
         speed = s;
     }
     
-    void setDistance(double d) {
+    void setDistance(double d) 
+    {
         distance = d;
     }
+
+    double getDistance() const
+    {
+        return distance;
+    }
     
-    void addWagon(Wagon* wagon) {
+    void addWagon(Wagon* wagon) 
+    {
         wagons.push_back(wagon);
     }
 
-     void removeWagon(int wagonID) {
+     void removeWagon(int wagonID) 
+    {
         wagons.erase(
             std::remove_if(wagons.begin(), wagons.end(),
                 [wagonID](Wagon* w) { return w->getId() == wagonID; }),
@@ -105,20 +114,25 @@ public:
         );
     }
     
-    Wagon* getWagonByID(int wagonID) {
-        for (Wagon* wagon : wagons) {
-            if (wagon->getId() == wagonID) {
+    Wagon* getWagonByID(int wagonID) 
+    {
+        for (Wagon* wagon : wagons) 
+        {
+            if (wagon->getId() == wagonID) 
+            {
                 return wagon;
             }
         }
         return nullptr;
     }
     
-    bool hasDeparted(const TimePoint& currentTime) {
+    bool hasDeparted(const TimePoint& currentTime) 
+    {
         return currentTime >= departureTime;
     }
     
-    bool hasArrived(const TimePoint& currentTime) {
+    bool hasArrived(const TimePoint& currentTime) 
+    {
         return currentTime >= arrivalTime;
     }
 

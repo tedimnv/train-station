@@ -13,8 +13,33 @@ class FirstClass : public Wagon
     bool includesFood;
 
 public:
-    virtual double calculatePrice(double Price, double comfortFactor, bool includesFood);
+    
+    void printSeats(int seatCount) const override 
+    {
+        std::cout << "First Class Seats:\n";
+        for (int i = 1; i <= seatCount; i++) 
+        {
+            std::cout << "Seat " << i << ": " << (isSeatAvailable(i) ? "Available" : "Taken") << "\n";
+        }
+    }
+    
+    static inline double calculatePrice(double Price, double comfortFactor, bool includesFood);
     double ticketPrice() override; 
+
+    void setComfortFactor(double factor)
+    {
+        comfortFactor = factor;
+    }
+
+    double getComfortFactor()
+    {
+        return comfortFactor;
+    }
+
+    void setIncludesFood(bool food) 
+    { 
+        includesFood = food; 
+    }
 
 };
 
