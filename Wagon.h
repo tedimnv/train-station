@@ -35,7 +35,8 @@ public:
     void setSeats(int seatsCount)
     {
         seats.clear();
-        for (int i = 1; i <= seatsCount; i++) {
+        for (int i = 1; i <= seatsCount; i++) 
+        {
             seats.push_back({i, false});
         }
     }
@@ -49,8 +50,10 @@ public:
     virtual void printSeats(int seatCount) const = 0;
     bool isSeatAvailable(int seatNumber) const
     {
-        for (const auto& seat : seats) {
-            if (seat.seatNumber == seatNumber) {
+        for (const auto& seat : seats) 
+        {
+            if (seat.seatNumber == seatNumber) 
+            {
                 return !seat.taken;
             }
         }
@@ -59,12 +62,25 @@ public:
 
     void bookSeat(int seatNumber)
     {
-        for (auto& seat : seats) {
-            if (seat.seatNumber == seatNumber) {
+        for (auto& seat : seats) 
+        {
+            if (seat.seatNumber == seatNumber) 
+            {
                 seat.taken = true;
                 break;
             }
         }
+    }
+
+    bool hasBookedSeats() const
+    {
+        for (const auto& seat : seats) 
+        {
+            if (seat.taken) {
+                return true;
+            }
+        }
+        return false;
     }
 
     const int getStartingPrice() const
@@ -73,6 +89,19 @@ public:
     }
 
     virtual double ticketPrice() = 0;
+
+    void releaseSeat(int seatNumber)
+    {
+        for (auto& seat : seats)
+        {
+            if (seat.seatNumber == seatNumber)
+            {
+                seat.taken = false;
+                break;
+            }
+        }
+    }
+    
     
 
     // const int chars = "===Age Card===" +1; >> <<

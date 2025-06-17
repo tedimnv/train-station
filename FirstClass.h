@@ -22,7 +22,7 @@ public:
             std::cout << "Seat " << i << ": " << (isSeatAvailable(i) ? "Available" : "Taken") << "\n";
         }
     }
-    
+
     static inline double calculatePrice(double Price, double comfortFactor, bool includesFood);
     double ticketPrice() override; 
 
@@ -31,7 +31,7 @@ public:
         comfortFactor = factor;
     }
 
-    double getComfortFactor()
+    double getComfortFactor() const
     {
         return comfortFactor;
     }
@@ -40,6 +40,12 @@ public:
     { 
         includesFood = food; 
     }
+
+    bool getIncludesFood() const 
+    { 
+        return includesFood; 
+    }
+
 
 };
 

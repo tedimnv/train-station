@@ -2,6 +2,8 @@
 #include "Train.h"
 #include "Wagon.h"
 
+int Train::nextTrainID = 1;
+
 // void Train::addWagon(Wagon*)
 // {
 

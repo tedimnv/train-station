@@ -1,0 +1,15 @@
+login tedi 123
+add-station Vienna
+add-station Rome
+add-station Sofia
+add-train Vienna Rome 60 60 12/12/2030 20:45
+add-train Sofia Rome 120 60 12/12/2030 19:45
+add-train Rome Vienna 30 60 12/12/2005 05:30
+add-wagon 1 20 1 0.5 1
+add-wagon 0 second-class 2 5
+print-schedule Sofia
+print-schedule Rome
+print-schedule-destination Sofia Rome
+print-schedule-time Sofia 12/12/2006
+print-schedule-time Sofia 12/12/2000
+exit

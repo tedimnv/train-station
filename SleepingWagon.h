@@ -17,8 +17,9 @@ public:
             std::cout << "Bed " << i << ": " << (isSeatAvailable(i) ? "Available" : "Taken") << "\n";
         }
     }
-    
+
     static inline double calculatePrice(double startingPrice, double pricePer100Km, int distance);
+
     double ticketPrice() override;
 
     void setPricePer100Km(double price) 
@@ -26,8 +27,20 @@ public:
         pricePer100Km = price; 
     }
 
+    double getPricePer100Km() const 
+    { 
+        return pricePer100Km; 
+    }
+
+
     void setDistance(int dist) 
     { 
         distance = dist; 
     }
+
+    int getDistance() 
+    { 
+        return distance; 
+    }
+
 };

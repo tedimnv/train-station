@@ -6,6 +6,7 @@ class Station;
 
 class Train
 {
+    static int nextTrainID;
     int trainId;
     const Station* startingStation;
     const Station* finalStation;
@@ -18,12 +19,18 @@ class Train
     std::vector<Wagon*> wagons;
 
 public:
+    
+    Train() 
+    {
+        trainId = nextTrainID++;
+    }
+
     void setStartingStation(const Station* station)
     {
         startingStation = station;
     }
 
-    const Station* getStartingStation() 
+    const Station* getStartingStation() const
     {
         return startingStation;
     }
@@ -33,7 +40,7 @@ public:
         finalStation = station;
     }
 
-    const Station* getFinalStation() 
+    const Station* getFinalStation() const
     {
         return finalStation;
     }
@@ -83,7 +90,15 @@ public:
         return arrivalPlatform;
     }
 
-   
+    bool hasDeparted(const TimePoint& currentTime) const
+    {
+        return currentTime >= departureTime;
+    }
+    
+    bool hasArrived(const TimePoint& currentTime) 
+    {
+        return currentTime >= arrivalTime;
+    }
 
     void setSpeed(int s) 
     {
@@ -105,14 +120,17 @@ public:
         wagons.push_back(wagon);
     }
 
-     void removeWagon(int wagonID) 
+    void removeWagon(int wagonID) 
     {
-        wagons.erase(
-            std::remove_if(wagons.begin(), wagons.end(),
-                [wagonID](Wagon* w) { return w->getId() == wagonID; }),
-            wagons.end()
-        );
+        for (size_t i = 0; i < wagons.size(); ++i) {
+            if (wagons[i]->getId() == wagonID) {
+                delete wagons[i];  // Delete the wagon object first
+                wagons.erase(wagons.begin() + i);
+                break;  // Important: break after erasing to avoid issues
+            }
+        }
     }
+
     
     Wagon* getWagonByID(int wagonID) 
     {
@@ -125,16 +143,29 @@ public:
         }
         return nullptr;
     }
-    
-    bool hasDeparted(const TimePoint& currentTime) 
+
+    const std::vector<Wagon*>& getWagons() const
     {
-        return currentTime >= departureTime;
-    }
-    
-    bool hasArrived(const TimePoint& currentTime) 
-    {
-        return currentTime >= arrivalTime;
+        return wagons;
     }
 
+    void removeWagonKeepObject(int wagonID) 
+    {
+        for (size_t i = 0; i < wagons.size(); ++i) {
+            if (wagons[i]->getId() == wagonID) {
+                wagons.erase(wagons.begin() + i);
+                break;  // Important: break after erasing to avoid issues
+            }
+        }
+    }
+
+    ~Train() 
+    {
+        for (Wagon* wagon : wagons) 
+        {
+            delete wagon;
+        }
+        wagons.clear();
+    }
 };
 

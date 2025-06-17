@@ -37,7 +37,7 @@ public:
         {
             if (isPlatformFree(platform, time))
             {
-                return platform - 1;
+                return platform;
             }
         }
         

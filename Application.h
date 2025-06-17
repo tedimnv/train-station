@@ -8,8 +8,18 @@
 #include "SecondClass.h"
 #include "SleepingWagon.h"
 #include "Wagon.h"
+#include "Ticket.h"
 
+// за print-schedule
+bool compareTrainsByArrivalTime(const Train* a, const Train* b) 
+{
+    return a->getArrivalTime() < b->getArrivalTime();
+}
 
+bool compareTrainsByDepartureTime(const Train* a, const Train* b) 
+{
+    return a->getDepartureTime() < b->getDepartureTime();
+}
 
 class Application
 {
@@ -76,6 +86,531 @@ public:
                 for ( size_t i = 0 ; i < stations.size() ; i++) 
                 {
                     std::cout << stations[i].getStationName() << std::endl;
+                }
+            }
+            else if(command == "print-schedule")
+            {
+                std::string stationName;
+                ss >> stationName;
+                
+                if (stationName.empty()) 
+                {
+                    std::cout << "Error: Please give a station name!\n";
+                    continue;
+                }
+                
+                Station* station = stationRepo.findByName(stationName);
+                
+                if (!station) 
+                {
+                    std::cout << "Error: No such station " << stationName << std::endl;
+                    continue;
+                }
+                
+                TimePoint currentTime = getCurrentTime();
+                
+                std::cout << "=== Schedule for station " << stationName << " ===" << std::endl;
+                
+                std::cout << "Arrivals:" << std::endl;
+                std::cout << "|   Arrival Time   | Arrival Platform | Train ID | Starting station |" << std::endl;
+                std::cout << " ------------------------------------------------------------------- " << std::endl;
+                
+                const std::vector<Train*>& arrivingTrains = station->getArrivingTrains();
+                
+                std::vector<Train*> sortedArrivingTrains = arrivingTrains;
+                std::sort(sortedArrivingTrains.begin(), sortedArrivingTrains.end(), compareTrainsByArrivalTime);
+                 
+                for (const Train* train : sortedArrivingTrains) 
+                {
+                    std::cout << "| ";
+                    printTime(train->getArrivalTime());
+                    std::cout << " | " << train->getArrivalPlatform()  << "                | " << train->getId() << "           | " << train->getStartingStation()->getStationName() << "     |" << std::endl;
+                }
+                
+                std::cout << std::endl;
+                
+                // Print Departures
+                std::cout << "Departures:" << std::endl;
+                std::cout << "|  Departure Time  |   Arrival Time   | Departure Platform | Train ID | Status | Destination |" << std::endl;
+                std::cout << " --------------------------------------------------------------------------------------------" << std::endl;
+                
+                const std::vector<Train*>& departingTrains = station->getDepartingTrains();
+                
+                std::vector<Train*> sortedDepartingTrains = departingTrains;
+                std::sort(sortedDepartingTrains.begin(), sortedDepartingTrains.end(), compareTrainsByDepartureTime);
+    
+                
+                for (const Train* train : sortedDepartingTrains) 
+                {
+                    std::cout << "| ";
+                    printTime(train->getDepartureTime());
+                    std::cout << " | ";
+                    printTime(train->getArrivalTime());
+                    std::cout << " | "  << train->getDeparturePlatform() << "                  | " << train->getId() << "        | ";
+                    
+                    if (train->hasDeparted(currentTime)) 
+                    {
+                        std::cout << "Departed";
+                    } 
+                    else 
+                    {
+                        std::cout << "To depart";
+                    }
+                    
+                    std::cout << " | "  << train->getFinalStation()->getStationName() << "   |";
+                }
+             
+                std::cout << std::endl << std::endl;
+
+            }
+            else if(command == "print-schedule-destination")
+            {
+                std::string stationName;
+                std::string destinationName;
+                ss >> stationName >> destinationName;
+                
+                if (stationName.empty()) 
+                {
+                    std::cout << "Error: Please give a station name!\n";
+                    continue;
+                }
+                
+                if (destinationName.empty()) 
+                {
+                    std::cout << "Error: Please give a destination name!\n";
+                    continue;
+                }
+                
+                Station* station = stationRepo.findByName(stationName);
+                
+                if (!station) 
+                {
+                    std::cout << "Error: No such station " << stationName << std::endl;
+                    continue;
+                }
+                
+                Station* destination = stationRepo.findByName(destinationName);
+                
+                if (!destination) 
+                {
+                    std::cout << "Error: No such destination " << destinationName << std::endl;
+                    continue;
+                }
+                
+                TimePoint currentTime = getCurrentTime();
+                
+                std::cout << "=== Schedule for departures to  " << destinationName << " ===" << std::endl;
+                
+                const std::vector<Train*>& departingTrains = station->getDepartingTrains();
+                std::vector<Train*> trainsToDestination;
+                
+                for (Train* train : departingTrains) 
+                {
+                    if (train->getFinalStation()->getStationName() == destinationName) 
+                    {
+                        trainsToDestination.push_back(train);
+                    }
+                }
+                
+                if (trainsToDestination.empty()) 
+                {
+                    std::cout << "No trains found from " << stationName << " to " << destinationName << std::endl;
+                    continue;
+                }
+                
+                std::sort(trainsToDestination.begin(), trainsToDestination.end(), compareTrainsByDepartureTime);
+                
+                std::cout << "Departures to " << destinationName << ":" << std::endl;
+                std::cout << "|  Departure Time  |   Arrival Time   | Departure Platform | Train ID | Status |" << std::endl;
+                std::cout << " ------------------------------------------------------------------------------ " << std::endl;
+                
+                for (const Train* train : trainsToDestination) 
+                {
+                    std::cout << "| ";
+                    printTime(train->getDepartureTime());
+                    std::cout << " | ";
+                    printTime(train->getArrivalTime());
+                    std::cout << " | " << train->getDeparturePlatform() << "                  | " << train->getId() << "        | ";
+                    
+                    if (train->hasDeparted(currentTime)) 
+                    {
+                        std::cout << "Departed";
+                    } 
+                    else 
+                    {
+                        std::cout << "To depart";
+                    }
+                    
+                    std::cout << " |" << std::endl;
+                }
+                
+                std::cout << std::endl;
+            }
+            else if(command == "print-schedule-time")
+            {
+                std::string stationName;
+                ss >> stationName;
+                
+                if (stationName.empty()) 
+                {
+                    std::cout << "Error: Please give a station name!\n";
+                    continue;
+                }
+                
+                Station* station = stationRepo.findByName(stationName);
+                
+                if (!station) 
+                {
+                    std::cout << "Error: No such station " << stationName << std::endl;
+                    continue;
+                }
+                
+                // Parse the time from the remaining input
+                TimePoint specifiedTime;
+                try 
+                {
+                    specifiedTime = parseTime(ss);
+                }
+                catch (const std::exception& e) 
+                {
+                    std::cout << "Error: Invalid time format! Please use: DD MM YYYY HH MM\n";
+                    continue;
+                }
+                
+                std::cout << "=== Schedule for station " << stationName << " after ";
+                printTime(specifiedTime);
+                std::cout << " ===" << std::endl;
+                
+                // Filter departing trains that depart after the specified time
+                const std::vector<Train*>& departingTrains = station->getDepartingTrains();
+                std::vector<Train*> trainsAfterTime;
+                
+                for (Train* train : departingTrains) 
+                {
+                    if (train->getDepartureTime() > specifiedTime) 
+                    {
+                        trainsAfterTime.push_back(train);
+                    }
+                }
+                
+                if (trainsAfterTime.empty()) 
+                {
+                    std::cout << "No trains found departing from " << stationName << " after ";
+                    printTime(specifiedTime);
+                    std::cout << std::endl;
+                    continue;
+                }
+                
+                // Sort trains by departure time
+                std::sort(trainsAfterTime.begin(), trainsAfterTime.end(), compareTrainsByDepartureTime);
+                
+                std::cout << "Departures after ";
+                printTime(specifiedTime);
+                std::cout << ":" << std::endl;
+                std::cout << "|  Departure Time  |   Arrival Time   | Departure Platform | Train ID | Status | Destination |" << std::endl;
+                std::cout << " --------------------------------------------------------------------------------------------" << std::endl;
+                
+                TimePoint currentTime = getCurrentTime();
+                
+                for (const Train* train : trainsAfterTime) 
+                {
+                    std::cout << "| ";
+                    printTime(train->getDepartureTime());
+                    std::cout << " | ";
+                    printTime(train->getArrivalTime());
+                    std::cout << " | " << train->getDeparturePlatform() << "                  | " << train->getId() << "        | ";
+                    
+                    if (train->hasDeparted(currentTime)) 
+                    {
+                        std::cout << "Departed";
+                    } 
+                    else 
+                    {
+                        std::cout << "To depart";
+                    }
+                    
+                    std::cout << " | " << train->getFinalStation()->getStationName() << "   |" << std::endl;
+                }
+                
+                std::cout << std::endl;
+            }
+            else if(command == "print-train")
+            {
+                int trainId;
+                ss >> trainId;
+                
+                if (!ss) 
+                {
+                    std::cout << "Error: Please give a train ID!\n";
+                    continue;
+                }
+                
+                Train* train = stationRepo.findTrainById(trainId);
+                
+                if (!train) 
+                {
+                    std::cout << "Error: Train with ID " << trainId << " not found!\n";
+                    continue;
+                }
+                
+                std::cout << "=== Train Information ===" << std::endl;
+                std::cout << "Train ID: " << train->getId() << std::endl;
+                std::cout << "Route: " << train->getStartingStation()->getStationName() 
+                        << " -> " << train->getFinalStation()->getStationName() << std::endl;
+                std::cout << "Distance: " << train->getDistance() << " km" << std::endl;
+                
+                std::cout << "Departure: ";
+                printTime(train->getDepartureTime());
+                std::cout << " from platform " << train->getDeparturePlatform() << std::endl;
+                
+                std::cout << "Arrival: ";
+                printTime(train->getArrivalTime());
+                std::cout << " to platform " << train->getArrivalPlatform() << std::endl;
+                
+                TimePoint currentTime = getCurrentTime();
+                std::cout << "Status: ";
+                if (train->hasDeparted(currentTime)) 
+                {
+                    if (train->hasArrived(currentTime)) 
+                    {
+                        std::cout << "Arrived";
+                    } 
+                    else 
+                    {
+                        std::cout << "In transit";
+                    }
+                } 
+                else 
+                {
+                    std::cout << "Scheduled to depart";
+                }
+                std::cout << std::endl;
+                
+                std::cout << "\n=== Wagons ===" << std::endl;
+                
+                const std::vector<Wagon*>& wagons = train->getWagons();
+                
+                if (wagons.empty()) 
+                {
+                    std::cout << "No wagons attached to this train." << std::endl;
+                    std::cout << std::endl;
+                    continue;
+                }
+                
+                std::cout << "| Wagon ID | Type  | Starting Price | Ticket Price | Available Seats |" << std::endl;
+                std::cout << " --------------------------------------------------------------------- " << std::endl;
+                
+                for (Wagon* wagon : wagons) 
+                {
+                    std::cout << "| "  << wagon->getId() << "      | ";
+                        
+                        // Determine wagon type by trying to cast to different types
+                        FirstClass* firstClass = dynamic_cast<FirstClass*>(wagon);
+                        SecondClass* secondClass = dynamic_cast<SecondClass*>(wagon);
+                        SleepingWagon* sleepingWagon = dynamic_cast<SleepingWagon*>(wagon);
+                        
+                        if (firstClass) 
+                        {
+                            std::cout << "1st" << " | ";
+                            std::cout << wagon->getStartingPrice() << " | ";
+                            std::cout << wagon->ticketPrice() << " | ";
+                            
+                            // Count available seats
+                            int availableSeats = 0;
+                            for (int seatNum = 1; seatNum <= constants::SEATS_COUNT; seatNum++) 
+                            {
+                                if (wagon->isSeatAvailable(seatNum)) 
+                                {
+                                    availableSeats++;
+                                }
+                            }
+                            std::cout << availableSeats << " |" << std::endl;
+                            
+                            std::cout << "         Details: Comfort Factor: " << firstClass->getComfortFactor() 
+                                    << ", Food: " << (firstClass->getIncludesFood() ? "Yes" : "No") << std::endl;
+                        }
+                        else if (secondClass) 
+                        {
+                            std::cout << "2nd" << " | ";
+                            std::cout << wagon->getStartingPrice() << " | ";
+                            std::cout << wagon->ticketPrice() << " | ";
+                            
+                            // Count available seats
+                            int availableSeats = 0;
+                            for (int seatNum = 1; seatNum <= constants::SEATS_COUNT; seatNum++) 
+                            {
+                                if (wagon->isSeatAvailable(seatNum)) 
+                                {
+                                    availableSeats++;
+                                }
+                            }
+                            std::cout << availableSeats << " |" << std::endl;
+                        }
+                        else if (sleepingWagon) 
+                        {
+                            std::cout << "Sleep" << " | ";
+                            std::cout << wagon->getStartingPrice() << " | ";
+                            std::cout << wagon->ticketPrice() << " | ";
+                            
+                            // Count available seats
+                            int availableSeats = 0;
+                            for (int seatNum = 1; seatNum <= constants::SEATS_COUNT; seatNum++) 
+                            {
+                                if (wagon->isSeatAvailable(seatNum)) 
+                                {
+                                    availableSeats++;
+                                }
+                            }
+                            std::cout << availableSeats << " |" << std::endl;
+                            
+                            std::cout << "         Details: Price per 100km: " << sleepingWagon->getPricePer100Km() << std::endl;
+                        }
+                        else 
+                        {
+                            std::cout << "Unknown" << " | ";
+                            std::cout << wagon->getStartingPrice() << " | ";
+                            std::cout << wagon->ticketPrice() << " | ";
+                            
+                            // Count available seats
+                            int availableSeats = 0;
+                            for (int seatNum = 1; seatNum <= constants::SEATS_COUNT; seatNum++) 
+                            {
+                                if (wagon->isSeatAvailable(seatNum)) 
+                                {
+                                    availableSeats++;
+                                }
+                            }
+                            std::cout << availableSeats << " |" << std::endl;
+                    }
+                }
+                
+                std::cout << std::endl;
+            }
+            else if(command == "buy-ticket")
+            {
+                int trainId;
+                int wagonId;
+                int seatId;
+                std::string ticketFileName;
+                
+                ss >> trainId >> wagonId >> seatId >> ticketFileName;
+                
+                if (!ss || ticketFileName.empty()) 
+                {
+                    std::cout << "Error: Please provide train ID, wagon ID, seat ID, and ticket file name!\n";
+                    continue;
+                }
+                
+                Train* train = stationRepo.findTrainById(trainId);
+                if (!train) 
+                {
+                    std::cout << "Error: Train with ID " << trainId << " not found!\n";
+                    continue;
+                }
+                
+                TimePoint currentTime = getCurrentTime();
+                if (train->hasDeparted(currentTime)) 
+                {
+                    std::cout << "Error: Cannot buy ticket for a train that has already departed!\n";
+                    continue;
+                }
+                
+                Wagon* wagon = train->getWagonByID(wagonId);
+                if (!wagon) 
+                {
+                    std::cout << "Error: Wagon with ID " << wagonId << " not found in train " << trainId << "!\n";
+                    continue;
+                }
+                
+                if (!wagon->isSeatAvailable(seatId)) 
+                {
+                    std::cout << "Error: Seat " << seatId << " is not available in wagon " << wagonId << "!\n";
+                    continue;
+                }
+                
+                // тип на вагона и допълнителните параметри
+                FirstClass* firstClass = dynamic_cast<FirstClass*>(wagon);
+                SecondClass* secondClass = dynamic_cast<SecondClass*>(wagon);
+                SleepingWagon* sleepingWagon = dynamic_cast<SleepingWagon*>(wagon);
+                
+                double finalPrice = wagon->getStartingPrice();
+                double discountApplied = 0.0;
+                
+                if (firstClass) 
+                {
+                    finalPrice = firstClass->ticketPrice();
+                    std::cout << "Purchasing first-class ticket...\n";
+                }
+                else if (secondClass) 
+                {
+                    int luggageWeight;
+                    ss >> luggageWeight;
+                    
+                    if (!ss) 
+                    {
+                        std::cout << "Error: Please provide luggage weight for second-class ticket!\n";
+                        continue;
+                    }
+                    
+                    if (luggageWeight < 0) 
+                    {
+                        std::cout << "Error: Luggage weight cannot be negative!\n";
+                        continue;
+                    }
+                    
+                    secondClass->setLuggageKg(luggageWeight);
+                    finalPrice = secondClass->ticketPrice();
+                    std::cout << "Purchasing second-class ticket with " << luggageWeight << "kg luggage...\n";
+                }
+                else if (sleepingWagon) 
+                {
+                    finalPrice = sleepingWagon->ticketPrice();
+                    std::cout << "Purchasing sleeping wagon ticket...\n";
+                }
+                else 
+                {
+                    std::cout << "Error: Unknown wagon type!\n";
+                    continue;
+                }
+                
+                wagon->bookSeat(seatId);
+                
+                Ticket ticket; //създаваме билета
+                ticket.setTimeOfPurchase(currentTime);
+                ticket.setTrain(*train);
+                ticket.setWagon(wagon);
+                ticket.setSeatID(seatId);
+                ticket.setBasePrice(wagon->getStartingPrice());
+                ticket.setDiscountApplied(discountApplied);
+                ticket.setFinalPrice(finalPrice);
+                
+                try 
+                {
+                    ticket.saveToFile(ticketFileName);
+                    
+                    std::cout << "Ticket purchased successfully!\n";
+                    std::cout << "=== Ticket Details ===\n";
+                    std::cout << "Train ID: " << trainId << "\n";
+                    std::cout << "Route: " << train->getStartingStation()->getStationName() 
+                            << " -> " << train->getFinalStation()->getStationName() << "\n";
+                    std::cout << "Departure: ";
+                    printTime(train->getDepartureTime());
+                    std::cout << " from platform " << train->getDeparturePlatform() << "\n";
+                    std::cout << "Arrival: ";
+                    printTime(train->getArrivalTime());
+                    std::cout << " to platform " << train->getArrivalPlatform() << "\n";
+                    std::cout << "Wagon ID: " << wagonId << "\n";
+                    std::cout << "Seat: " << seatId << "\n";
+                    std::cout << "Base Price: " << wagon->getStartingPrice() << "\n";
+                    std::cout << "Final Price: " << finalPrice << "\n";
+                    std::cout << "Ticket saved to: " << ticketFileName << "\n";
+                }
+                catch (const std::exception& e) 
+                {
+                    // освобождаване място?
+                    std::cout << "Error: Failed to save ticket to file: " << e.what() << "\n";
+                    std::cout << "Ticket purchase cancelled.\n";
+                    continue;
                 }
             }
             else if(command == "add-train")
@@ -153,7 +688,6 @@ public:
                 int trainId;
                 ss >> trainId;
                 
-                // проверявам дали съществува влака
                 Train* train = stationRepo.findTrainById(trainId);
 
                 if (!train) 
@@ -193,7 +727,6 @@ public:
                 
                 ss >> trainId >> wagonType >> startingPrice;
                 
-                // Намираме влака по ID
                 Train* train = stationRepo.findTrainById(trainId);
                 
                 if (!train) 
@@ -263,8 +796,6 @@ public:
                     
                     SecondClass* secondClassWagon = new SecondClass();
                     secondClassWagon->setStartingPrice(startingPrice);
-                    //secondClassWagon->setLuggageKg(luggageKg);
-                    //secondClassWagon->setPricePerKg(pricePerKg);
                     secondClassWagon->setSeats(constants::SEATS_COUNT);
                     
                     wagon = secondClassWagon;
@@ -356,6 +887,81 @@ public:
                 // Remove the wagon from the train
                 train->removeWagon(wagonId);
                 std::cout << "Wagon " << wagonId << " removed from train " << trainId << "!\n";
+            }
+            else if(command == "move-wagon")
+            {
+                if(!isAdmin)
+                {
+                    std::cout << "Error: You need to be an administrator to run this command!\n";
+                    continue;
+                }
+
+                int sourceTrainId;
+                int wagonId;
+                int destinationTrainId;
+                
+                ss >> sourceTrainId >> wagonId >> destinationTrainId;
+                
+                Train* sourceTrain = stationRepo.findTrainById(sourceTrainId);
+                if (!sourceTrain) 
+                {
+                    std::cout << "Error: Source train with ID " << sourceTrainId << " not found!\n";
+                    continue;
+                }
+                
+                Train* destinationTrain = stationRepo.findTrainById(destinationTrainId);
+                if (!destinationTrain) 
+                {
+                    std::cout << "Error: Destination train with ID " << destinationTrainId << " not found!\n";
+                    continue;
+                }
+                
+                if (sourceTrainId == destinationTrainId) 
+                {
+                    std::cout << "Error: Source and destination trains cannot be the same!\n";
+                    continue;
+                }
+                
+                TimePoint currentTime = getCurrentTime();
+
+                if (sourceTrain->hasDeparted(currentTime)) 
+                {
+                    std::cout << "Error: Cannot move wagon from a train that has already departed!\n";
+                    continue;
+                }
+                
+                if (destinationTrain->hasDeparted(currentTime)) 
+                {
+                    std::cout << "Error: Cannot move wagon to a train that has already departed!\n";
+                    continue;
+                }
+                
+                Wagon* wagon = sourceTrain->getWagonByID(wagonId);
+                if (!wagon) 
+                {
+                    std::cout << "Error: Wagon with ID " << wagonId << " not found in source train " << sourceTrainId << "!\n";
+                    continue;
+                }
+                
+                if (wagon->hasBookedSeats()) 
+                {
+                    std::cout << "Error: Cannot move wagon with booked tickets!\n";
+                    continue;
+                }
+                
+                std::cout << "Moving wagon " << wagonId << " from train " << sourceTrainId << " to train " << destinationTrainId << "...\n";
+                std::cout << "Wagon ID: " << wagon->getId() << std::endl;
+                std::cout << "Starting Price: " << wagon->getStartingPrice() << std::endl;
+                std::cout << "Ticket Price: " << wagon->ticketPrice() << std::endl;
+                
+                // Remove wagon from source train (but don't delete it)
+                sourceTrain->removeWagonKeepObject(wagonId);
+                
+                // Add wagon to destination train
+                destinationTrain->addWagon(wagon);
+                
+                std::cout << "Wagon " << wagonId << " successfully moved from train " << sourceTrainId << " to train " << destinationTrainId << "!\n";
+                std::cout << "New ticket price: " << wagon->ticketPrice() << std::endl;
             }
             else if(command == "exit")
             {

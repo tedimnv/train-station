@@ -4,6 +4,9 @@
 #include <sstream>
 #include <iomanip>
 #include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
 
 class Time
 {
@@ -49,4 +52,15 @@ static inline std::vector<std::string> split(const std::string& str, char delimi
         result.push_back(word);
     }
     return result;
+}
+
+// за принт във файл
+static inline void printTimeToFile(std::ofstream& file, const TimePoint& tp)
+{
+    auto time_t = std::chrono::system_clock::to_time_t(tp);
+    std::tm* tm = std::localtime(&time_t);
+    
+    std::ostringstream oss;
+    oss << std::put_time(tm, TIME_FORMAT);
+    file << oss.str();
 }

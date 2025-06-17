@@ -1,0 +1,14 @@
+login tedi 123
+add-station London
+add-station Paris
+add-station Amsterdam
+add-train London Paris 60 60 12/12/2030 20:45
+add-train Amsterdam Paris 120 60 12/12/2030 19:45
+add-train Paris London 30 60 12/12/2005 05:30
+add-wagon 1 70 1 0.5 1
+add-wagon 0 second-class 2 5
+remove-wagon 1 1
+move-wagon 0 1 1
+move-wagon 0 2 1
+print-schedule Paris
+exit
