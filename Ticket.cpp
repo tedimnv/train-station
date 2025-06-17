@@ -30,7 +30,7 @@ void Ticket::saveToFile(const std::string& fileName)
         file << "Discount Applied: " << discountApplied << " BGN\n";
     }
     file << "Final Price: " << finalPrice << " BGN\n";
-    file << "===================\n";
+    file << "=====================\n";
     
     file.close();
 }

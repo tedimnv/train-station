@@ -1,14 +1,17 @@
 #pragma once
+#include <sstream>
 #include "AdminRepo.h"
 #include "StationsRepo.h"
 #include "TrainRepo.h"
-#include <sstream>
 #include "Time.h"
 #include "FirstClass.h"
 #include "SecondClass.h"
 #include "SleepingWagon.h"
 #include "Wagon.h"
 #include "Ticket.h"
+#include "AgeCard.h"
+#include "DistanceCard.h"
+#include "RouteCard.h"
 
 // за print-schedule
 bool compareTrainsByArrivalTime(const Train* a, const Train* b) 
@@ -398,11 +401,11 @@ public:
                 }
                 
                 std::cout << "| Wagon ID | Type  | Starting Price | Ticket Price | Available Seats |" << std::endl;
-                std::cout << " --------------------------------------------------------------------- " << std::endl;
+                std::cout << " -------------------------------------------------------------------- " << std::endl;
                 
                 for (Wagon* wagon : wagons) 
                 {
-                    std::cout << "| "  << wagon->getId() << "      | ";
+                    std::cout << "| "  << wagon->getId() << "        | ";
                         
                         // Determine wagon type by trying to cast to different types
                         FirstClass* firstClass = dynamic_cast<FirstClass*>(wagon);
@@ -411,9 +414,9 @@ public:
                         
                         if (firstClass) 
                         {
-                            std::cout << "1st" << " | ";
-                            std::cout << wagon->getStartingPrice() << " | ";
-                            std::cout << wagon->ticketPrice() << " | ";
+                            std::cout << "1st" << "   | ";
+                            std::cout << wagon->getStartingPrice() << "             | ";
+                            std::cout << wagon->ticketPrice() << "           | ";
                             
                             // Count available seats
                             int availableSeats = 0;
@@ -424,16 +427,16 @@ public:
                                     availableSeats++;
                                 }
                             }
-                            std::cout << availableSeats << " |" << std::endl;
+                            std::cout << availableSeats << "              |" << std::endl;
                             
                             std::cout << "         Details: Comfort Factor: " << firstClass->getComfortFactor() 
                                     << ", Food: " << (firstClass->getIncludesFood() ? "Yes" : "No") << std::endl;
                         }
                         else if (secondClass) 
                         {
-                            std::cout << "2nd" << " | ";
-                            std::cout << wagon->getStartingPrice() << " | ";
-                            std::cout << wagon->ticketPrice() << " | ";
+                            std::cout << "2nd" << "   | ";
+                            std::cout << wagon->getStartingPrice() << "             | ";
+                            std::cout << wagon->ticketPrice() << "           | ";
                             
                             // Count available seats
                             int availableSeats = 0;
@@ -444,13 +447,13 @@ public:
                                     availableSeats++;
                                 }
                             }
-                            std::cout << availableSeats << " |" << std::endl;
+                            std::cout << availableSeats << "              |" << std::endl;
                         }
                         else if (sleepingWagon) 
                         {
                             std::cout << "Sleep" << " | ";
-                            std::cout << wagon->getStartingPrice() << " | ";
-                            std::cout << wagon->ticketPrice() << " | ";
+                            std::cout << wagon->getStartingPrice() << "             | ";
+                            std::cout << wagon->ticketPrice() << "           | ";
                             
                             // Count available seats
                             int availableSeats = 0;
@@ -461,7 +464,7 @@ public:
                                     availableSeats++;
                                 }
                             }
-                            std::cout << availableSeats << " |" << std::endl;
+                            std::cout << availableSeats << "              |" << std::endl;
                             
                             std::cout << "         Details: Price per 100km: " << sleepingWagon->getPricePer100Km() << std::endl;
                         }
@@ -588,7 +591,7 @@ public:
                 {
                     ticket.saveToFile(ticketFileName);
                     
-                    std::cout << "Ticket purchased successfully!\n";
+                    std::cout << "Ticket purchased successfully!\n\n";
                     std::cout << "=== Ticket Details ===\n";
                     std::cout << "Train ID: " << trainId << "\n";
                     std::cout << "Route: " << train->getStartingStation()->getStationName() 
@@ -603,7 +606,7 @@ public:
                     std::cout << "Seat: " << seatId << "\n";
                     std::cout << "Base Price: " << wagon->getStartingPrice() << "\n";
                     std::cout << "Final Price: " << finalPrice << "\n";
-                    std::cout << "Ticket saved to: " << ticketFileName << "\n";
+                    std::cout << "Ticket saved to: " << ticketFileName << "\n\n";
                 }
                 catch (const std::exception& e) 
                 {
@@ -884,7 +887,6 @@ public:
                 std::cout << "Starting Price: " << wagon->getStartingPrice() << std::endl;
                 std::cout << "Ticket Price: " << wagon->ticketPrice() << std::endl;
                 
-                // Remove the wagon from the train
                 train->removeWagon(wagonId);
                 std::cout << "Wagon " << wagonId << " removed from train " << trainId << "!\n";
             }
@@ -954,14 +956,109 @@ public:
                 std::cout << "Starting Price: " << wagon->getStartingPrice() << std::endl;
                 std::cout << "Ticket Price: " << wagon->ticketPrice() << std::endl;
                 
-                // Remove wagon from source train (but don't delete it)
                 sourceTrain->removeWagonKeepObject(wagonId);
                 
-                // Add wagon to destination train
                 destinationTrain->addWagon(wagon);
                 
                 std::cout << "Wagon " << wagonId << " successfully moved from train " << sourceTrainId << " to train " << destinationTrainId << "!\n";
                 std::cout << "New ticket price: " << wagon->ticketPrice() << std::endl;
+            }
+            else if(command == "create-discount-card")
+            {
+                if(!isAdmin)
+                {
+                    std::cout << "Error: You need to be an administrator to run this command!\n";
+                    continue;
+                }
+                
+                std::string cardType;
+                std::string userName;
+                std::string fileName;
+                
+                ss >> cardType >> userName >> fileName;
+                
+                if (cardType.empty() || userName.empty() || fileName.empty()) 
+                {
+                    std::cout << "Error: Give card type, user name, and file name!\n";
+                    std::cout << "Card types: age, distance, route\n";
+                    continue;
+                }
+                
+                try {
+                    if (cardType == "age") 
+                    {
+                        int age;
+                        ss >> age;
+                        
+                        if (!ss) 
+                        {
+                            std::cout << "Error: Please give age for age card!\n\n";
+                            continue;
+                        }
+                        
+                        AgeCard ageCard(userName, age);
+                        ageCard.saveToFile(fileName);
+                        
+                        std::cout << "Age discount card created successfully!\n";
+                        std::cout << "Card ID: " << ageCard.getID() << "\n";
+                        std::cout << "Card Holder: " << ageCard.getCardHolderName() << "\n";
+                        std::cout << "Age: " << ageCard.getCardHoldersAge() << "\n";
+                        std::cout << "Discount: " << ageCard.getDiscountPercentage() << "%\n";
+                        std::cout << "Card saved to: " << fileName << "\n\n";
+                    }
+                    else if (cardType == "distance") 
+                    {
+                        double maxDistance;
+                        ss >> maxDistance;
+                        
+                        if (!ss || maxDistance <= 0) 
+                        {
+                            std::cout << "Error: Please give valid max distance for distance card!\n\n";
+                            continue;
+                        }
+                        
+                        DistanceCard distanceCard(userName, maxDistance);
+                        distanceCard.saveToFile(fileName);
+                        
+                        std::cout << "Distance discount card created successfully!\n";
+                        std::cout << "Card ID: " << distanceCard.getID() << "\n";
+                        std::cout << "Card Holder: " << distanceCard.getCardHolderName() << "\n";
+                        std::cout << "Max Distance: " << distanceCard.getMaxDistance() << " km\n";
+                        std::cout << "Short Distance Discount: 50%\n";
+                        std::cout << "Long Distance Discount: 30%\n";
+                        std::cout << "Card saved to: " << fileName << "\n\n";
+                    }
+                    else if (cardType == "route") 
+                    {
+                        std::string destination;
+                        ss >> destination;
+                        
+                        if (destination.empty()) 
+                        {
+                            std::cout << "Error: Please give destination for route card!\n\n";
+                            continue;
+                        }
+                        
+                        RouteCard routeCard(userName, destination);
+                        routeCard.saveToFile(fileName);
+                        
+                        std::cout << "Route discount card created successfully!\n";
+                        std::cout << "Card ID: " << routeCard.getID() << "\n";
+                        std::cout << "Card Holder: " << routeCard.getCardHolderName() << "\n";
+                        std::cout << "Destination: " << routeCard.getDestination() << "\n";
+                        std::cout << "Discount: " << routeCard.getDiscountPercentage() << "%\n";
+                        std::cout << "Card saved to: " << fileName << "\n\n";
+                    }
+                    else 
+                    {
+                        std::cout << "Error: Unknown card type '" << cardType << "'!\n";
+                        std::cout << "Available types: age, distance, route\n";
+                    }
+                }
+                catch (const std::exception& e) 
+                {
+                    std::cout << "Error: Failed to create discount card: " << e.what() << "\n";
+                }
             }
             else if(command == "exit")
             {

@@ -1,0 +1,8 @@
+=== DISCOUNT CARD ===
+Card Type: DistanceCard
+Card ID: 654397
+Card Holder: Quatro
+Max Distance: 200 km
+Short Distance Discount (≤200km): 50%
+Long Distance Discount (>200km): 30%
+=====================

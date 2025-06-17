@@ -1,0 +1,7 @@
+=== DISCOUNT CARD ===
+Card Type: AgeCard
+Card ID: 654397
+Card Holder: MarielaBelcheva
+Age: 15
+Discount: 50%
+=====================

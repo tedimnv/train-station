@@ -1,0 +1,7 @@
+=== DISCOUNT CARD ===
+Card Type: RouteCard
+Card ID: 654397
+Card Holder: Daniela
+Applicable Destination: Vienna
+Discount: 100%
+=====================

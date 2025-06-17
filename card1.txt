@@ -1,0 +1,7 @@
+=== DISCOUNT CARD ===
+Card Type: AgeCard
+Card ID: 654397
+Card Holder: TediMineva
+Age: 1
+Discount: 100%
+=====================

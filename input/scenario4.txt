@@ -12,5 +12,10 @@ add-wagon 3 second-class 2 5
 print-train 1
 print-train 2
 print-train 3
-buy-ticket 2 2 1 3 ticket1
+buy-ticket 2 2 1 ticket1.txt 3
+create-discount-card age TediMineva card1.txt 1
+create-discount-card age MarielaBelcheva card2.txt 15
+create-discount-card age Rayochi card3.txt 30
+create-discount-card route Daniela card4.txt Vienna
+create-discount-card distance Quatro card5.txt 200
 exit

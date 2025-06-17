@@ -4,14 +4,16 @@
 
 class DistanceCard : public DiscountCard
 {
-    double travelDistance;
+    private:
     double maxDistance;
 
 public:
-
-    DistanceCard(double maxDistance, double travelDistance);
+    DistanceCard(const std::string& name, double maxDistance);
     
-    void setDiscount();
-    void getMaxDistance(double maxDistance);
-    void getTravelDistance(double travelDistance);
+    void setDiscount() override;
+    bool isApplicable(const std::string& route = "", double distance = 0) const override;
+    void saveToFile(const std::string& fileName) const override;
+    
+    double getMaxDistance() const { return maxDistance; }
+
 };

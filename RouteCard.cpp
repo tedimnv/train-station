@@ -1,45 +1,47 @@
 #include <iostream>
-#include <cstring> // for strlen, strcpy
+#include <cstring>
+#include <fstream>
 #include "RouteCard.h"
 
 namespace constants
 {
-    const int DISCOUNT = 100;
+    const int ROUTE_DISCOUNT = 100; // 100% for matching routes
+    const int NO_ROUTE_DISCOUNT = 0; // 0% for non matching routes
 }
 
-// Constructor
-RouteCard::RouteCard(const char* dest, const char* r) 
+RouteCard::RouteCard(const std::string& name, const std::string& dest)
+    : destination(dest)
 {
-    destination = new char[strlen(dest) + 1];
-    strcpy(destination, dest);
-
-    route = new char[strlen(r) + 1];
-    strcpy(route, r);
-}
-
-void RouteCard::getDestination(char *destination)
-{
-
-}
-
-void RouteCard::getRoute(char *route)
-{
-
+    setCardHolder(name);
+    setClassType("RouteCard");
+    generateID();
+    setDiscount();
 }
 
 void RouteCard::setDiscount()
 {
-    int percentage = 0;
-
-    if(destination == route)
-        percentage = constants::DISCOUNT;
-
-    this->setDiscountPercentage(percentage);
+    setDiscountPercentage(constants::ROUTE_DISCOUNT);
 }
 
-// Destructor
-RouteCard::~RouteCard() 
+bool RouteCard::isApplicable(const std::string& route, double distance) const
 {
-    delete[] destination;
-    delete[] route;
+    return (route.find(destination) != std::string::npos || route == applicableRoute);
+}
+
+void RouteCard::saveToFile(const std::string& fileName) const
+{
+    std::ofstream file(fileName);
+    if (!file.is_open()) {
+        throw std::runtime_error("Cannot open file for writing");
+    }
+    
+    file << "=== DISCOUNT CARD ===" << std::endl;
+    file << "Card Type: " << getClassType() << std::endl;
+    file << "Card ID: " << getID() << std::endl;
+    file << "Card Holder: " << getCardHolderName() << std::endl;
+    file << "Applicable Destination: " << destination << std::endl;
+    file << "Discount: " << getDiscountPercentage() << "%" << std::endl;
+    file << "=====================" << std::endl;
+    
+    file.close();
 }
