@@ -4,7 +4,7 @@ add-station Rome
 add-station Sofia
 add-train Vienna Rome 60 60 12/12/2030 20:45
 add-train Sofia Rome 120 60 12/12/2030 19:45
-add-train Rome Vienna 30 60 12/12/2005 05:30
+add-train Rome Vienna 30 60 12/12/2029  05:30
 add-wagon 1 1 70 0.5 1
 add-wagon 0 second-class 2 5
 add-wagon 2 1 20 0.5 yes
@@ -18,4 +18,7 @@ create-discount-card age MarielaBelcheva card2.txt 15
 create-discount-card age Rayochi card3.txt 30
 create-discount-card route Daniela card4.txt Vienna
 create-discount-card distance Quatro card5.txt 200
+buy-ticket-discount 1 1 1 ticket2.txt card1.txt 3
+buy-ticket-discount 2 1 1 ticket3.txt card4.txt 3
+buy-ticket-discount 2 3 1 ticket4.txt card2.txt 3
 exit

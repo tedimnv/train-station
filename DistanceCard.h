@@ -4,10 +4,11 @@
 
 class DistanceCard : public DiscountCard
 {
-    private:
+private:
     double maxDistance;
 
 public:
+    
     DistanceCard(const std::string& name, double maxDistance);
     
     void setDiscount() override;

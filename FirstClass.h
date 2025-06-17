@@ -7,6 +7,7 @@ namespace constants
     const int SEATS_COUNT = 10;
     const int FOOD_PRICE = 10;
 }
+
 class FirstClass : public Wagon
 {
     double comfortFactor; //from 0-1 
@@ -14,6 +15,10 @@ class FirstClass : public Wagon
 
 public:
     
+    FirstClass(){};
+    virtual ~FirstClass(){};
+    virtual double ticketPrice() override;
+
     void printSeats(int seatCount) const override 
     {
         std::cout << "First Class Seats:\n";
@@ -24,7 +29,6 @@ public:
     }
 
     static inline double calculatePrice(double Price, double comfortFactor, bool includesFood);
-    double ticketPrice() override; 
 
     void setComfortFactor(double factor)
     {
@@ -45,7 +49,6 @@ public:
     { 
         return includesFood; 
     }
-
 
 };
 

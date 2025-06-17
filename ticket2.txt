@@ -1,0 +1,12 @@
+=== TRAIN TICKET ===
+Purchase Time: 17/06/2025 05:44
+Train ID: 1
+Route: Vienna -> Rome
+Departure: 12/12/2030 20:45 from platform 2
+Arrival: 12/12/2030 21:45 to platform 2
+Wagon ID: 1
+Seat: 1
+Base Price: 70 BGN
+Discount Applied: 45 BGN
+Final Price: 0 BGN
+=====================

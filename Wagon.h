@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-struct Seat
+struct Seat 
 {
     int seatNumber;
     bool taken;
@@ -16,8 +16,6 @@ class Wagon //abstract
 
     
 public:
-
-   
 
     void setWagonID()
     { 

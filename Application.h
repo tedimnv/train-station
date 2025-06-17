@@ -1,5 +1,6 @@
 #pragma once
 #include <sstream>
+#include <fstream>
 #include "AdminRepo.h"
 #include "StationsRepo.h"
 #include "TrainRepo.h"
@@ -23,6 +24,73 @@ bool compareTrainsByDepartureTime(const Train* a, const Train* b)
 {
     return a->getDepartureTime() < b->getDepartureTime();
 }
+
+// helper за buy-ticket-discount
+std::unique_ptr<DiscountCard> parseDiscountCard(const std::string& fileName) {
+    std::ifstream file(fileName);
+    if (!file.is_open()) {
+        throw std::runtime_error("Cannot open discount card file");
+    }
+    
+    std::string line;
+    std::string cardType;
+    std::string cardHolder;
+    int cardID = 0;
+    
+    while (std::getline(file, line)) {
+        if (line.find("Card Type:") != std::string::npos) {
+            cardType = line.substr(line.find(":") + 2);
+        } else if (line.find("Card Holder:") != std::string::npos) {
+            cardHolder = line.substr(line.find(":") + 2);
+        } else if (line.find("Card ID:") != std::string::npos) {
+            cardID = std::stoi(line.substr(line.find(":") + 2));
+        }
+    }
+    
+    file.close();
+    
+    if (cardType == "AgeCard") {
+        // Re-read file to get age
+        file.open(fileName);
+        int age = 0;
+        while (std::getline(file, line)) {
+            if (line.find("Age:") != std::string::npos) {
+                age = std::stoi(line.substr(line.find(":") + 2));
+                break;
+            }
+        }
+        file.close();
+        return std::make_unique<AgeCard>(cardHolder, age);
+    } else if (cardType == "RouteCard") {
+        // Re-read file to get destination
+        file.open(fileName);
+        std::string destination;
+        while (std::getline(file, line)) {
+            if (line.find("Applicable Destination:") != std::string::npos) {
+                destination = line.substr(line.find(":") + 2);
+                break;
+            }
+        }
+        file.close();
+        return std::make_unique<RouteCard>(cardHolder, destination);
+    } else if (cardType == "DistanceCard") {
+        // Re-read file to get max distance
+        file.open(fileName);
+        double maxDistance = 0;
+        while (std::getline(file, line)) {
+            if (line.find("Max Distance:") != std::string::npos) {
+                std::string distStr = line.substr(line.find(":") + 2);
+                maxDistance = std::stod(distStr.substr(0, distStr.find(" km")));
+                break;
+            }
+        }
+        file.close();
+        return std::make_unique<DistanceCard>(cardHolder, maxDistance);
+    }
+    
+    throw std::runtime_error("Unknown card type");
+}
+
 
 class Application
 {
@@ -611,6 +679,168 @@ public:
                 catch (const std::exception& e) 
                 {
                     // освобождаване място?
+                    std::cout << "Error: Failed to save ticket to file: " << e.what() << "\n";
+                    std::cout << "Ticket purchase cancelled.\n";
+                    continue;
+                }
+            }
+            else if(command == "buy-ticket-discount")
+            {
+                int trainId;
+                int wagonId;
+                int seatId;
+                std::string ticketFileName;
+                std::string cardFileName;
+                
+                ss >> trainId >> wagonId >> seatId >> ticketFileName >> cardFileName;
+                
+                if (!ss || ticketFileName.empty() || cardFileName.empty()) 
+                {
+                    std::cout << "Error: Give train ID, wagon ID, seat ID, ticket file name, and card file name!\n";
+                    continue;
+                }
+                
+                Train* train = stationRepo.findTrainById(trainId);
+                if (!train) 
+                {
+                    std::cout << "Error: Train with ID " << trainId << " not found!\n";
+                    continue;
+                }
+                
+                TimePoint currentTime = getCurrentTime();
+                if (train->hasDeparted(currentTime)) 
+                {
+                    std::cout << "Error: Cannot buy ticket for a train that has already departed!\n";
+                    continue;
+                }
+                
+                Wagon* wagon = train->getWagonByID(wagonId);
+                if (!wagon) 
+                {
+                    std::cout << "Error: Wagon with ID " << wagonId << " not found in train " << trainId << "!\n";
+                    continue;
+                }
+                
+                if (!wagon->isSeatAvailable(seatId)) 
+                {
+                    std::cout << "Error: Seat " << seatId << " is not available in wagon " << wagonId << "!\n";
+                    continue;
+                }
+                
+                std::unique_ptr<DiscountCard> discountCard;
+                try 
+                {
+                    discountCard = parseDiscountCard(cardFileName);
+                } 
+                catch (const std::exception& e) 
+                {
+                    std::cout << "Error: Failed to load discount card: " << e.what() << "\n";
+                    continue;
+                }
+                
+                std::string route = train->getStartingStation()->getStationName() + " -> " + train->getFinalStation()->getStationName();
+                if (!discountCard->isApplicable(route, train->getDistance())) 
+                {
+                    std::cout << "Error: Discount card is not applicable for this route!\n";
+                    continue;
+                }
+                
+                FirstClass* firstClass = dynamic_cast<FirstClass*>(wagon);
+                SecondClass* secondClass = dynamic_cast<SecondClass*>(wagon);
+                SleepingWagon* sleepingWagon = dynamic_cast<SleepingWagon*>(wagon);
+                
+                double basePrice = wagon->getStartingPrice();
+                double finalPrice = basePrice;
+                
+                if (firstClass) 
+                {
+                    finalPrice = firstClass->ticketPrice();
+                    std::cout << "Purchasing first-class ticket with discount...\n";
+                }
+                else if (secondClass) 
+                {
+                    int luggageWeight;
+                    ss >> luggageWeight;
+                    
+                    if (!ss) 
+                    {
+                        std::cout << "Error: Please provide luggage weight for second-class ticket!\n";
+                        continue;
+                    }
+                    
+                    if (luggageWeight < 0) 
+                    {
+                        std::cout << "Error: Luggage weight cannot be negative!\n";
+                        continue;
+                    }
+                    
+                    secondClass->setLuggageKg(luggageWeight);
+                    finalPrice = secondClass->ticketPrice();
+                    std::cout << "Purchasing second-class ticket with " << luggageWeight << "kg luggage and discount...\n";
+                }
+                else if (sleepingWagon) 
+                {
+                    finalPrice = sleepingWagon->ticketPrice();
+                    std::cout << "Purchasing sleeping wagon ticket with discount...\n";
+                }
+                else 
+                {
+                    std::cout << "Error: Unknown wagon type!\n";
+                    continue;
+                }
+                
+                double discountPercentage = discountCard->getDiscountPercentage();
+                
+                DistanceCard* distanceCard = dynamic_cast<DistanceCard*>(discountCard.get());
+                if (distanceCard) {
+                    if (train->getDistance() > distanceCard->getMaxDistance()) {
+                        discountPercentage = 30; // Long distance discount
+                    } else {
+                        discountPercentage = 50; // Short distance discount
+                    }
+                }
+                
+                double discountAmount = finalPrice * (discountPercentage / 100.0);
+                double discountedPrice = finalPrice - discountAmount;
+                
+                wagon->bookSeat(seatId);
+                
+                Ticket ticket;
+                ticket.setTimeOfPurchase(currentTime);
+                ticket.setTrain(*train);
+                ticket.setWagon(wagon);
+                ticket.setSeatID(seatId);
+                ticket.setBasePrice(basePrice);
+                ticket.setDiscountApplied(discountAmount);
+                ticket.setFinalPrice(discountedPrice);
+                
+                try 
+                {
+                    ticket.saveToFile(ticketFileName);
+                    
+                    std::cout << "Ticket purchased successfully with discount!\n\n";
+                    std::cout << "=== Ticket Details ===\n";
+                    std::cout << "Train ID: " << trainId << "\n";
+                    std::cout << "Route: " << train->getStartingStation()->getStationName() 
+                            << " -> " << train->getFinalStation()->getStationName() << "\n";
+                    std::cout << "Departure: ";
+                    printTime(train->getDepartureTime());
+                    std::cout << " from platform " << train->getDeparturePlatform() << "\n";
+                    std::cout << "Arrival: ";
+                    printTime(train->getArrivalTime());
+                    std::cout << " to platform " << train->getArrivalPlatform() << "\n";
+                    std::cout << "Wagon ID: " << wagonId << "\n";
+                    std::cout << "Seat: " << seatId << "\n";
+                    std::cout << "Base Price: " << basePrice << "\n";
+                    std::cout << "Original Price: " << finalPrice << "\n";
+                    std::cout << "Discount Card: " << discountCard->getClassType() << "\n";
+                    std::cout << "Discount Applied: " << discountPercentage << "% (-" << discountAmount << ")\n";
+                    std::cout << "Final Price: " << discountedPrice << "\n";
+                    std::cout << "Ticket saved to: " << ticketFileName << "\n\n";
+                }
+                catch (const std::exception& e) 
+                {
+                    wagon->releaseSeat(seatId);
                     std::cout << "Error: Failed to save ticket to file: " << e.what() << "\n";
                     std::cout << "Ticket purchase cancelled.\n";
                     continue;

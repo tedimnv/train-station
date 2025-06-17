@@ -18,7 +18,11 @@ public:
         }
     }
 
-    static inline double calculatePrice(double startingPrice, int luggageKg, double pricePerKg);
+    static inline double calculatePrice(double startingPrice, int luggageKg, double pricePerKg)
+    {
+    return startingPrice + luggageKg*pricePerKg;
+    }
+
     double ticketPrice() override;
 
     void setLuggageKg(int kg) 
